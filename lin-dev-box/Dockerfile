@@ -55,15 +55,15 @@ export PATH=$PATH:$GOPATH/bin && \
 # Go tools
 go install github.com/jesseduffield/lazygit@latest && \
 go install github.com/dundee/gdu/v5/cmd/gdu@latest && \
-# AstroNvim base config
-git clone --depth 1 https://github.com/AstroNvim/AstroNvim /home/dev/.config/nvim && \
 # Clean apt
 apt clean && \
 # Create user and make it admin
 groupadd -g 1000 dev && \
 useradd -m -u 1000 -g dev -s /bin/bash dev && \
 echo "dev:1234" | chpasswd && \
-usermod -aG sudo dev
+usermod -aG sudo dev && \
+# AstroNvim base config
+git clone --depth 1 https://github.com/AstroNvim/AstroNvim /home/dev/.config/nvim
 
 # Set Go environment variables
 ENV PATH=$PATH:/usr/local/go/bin
