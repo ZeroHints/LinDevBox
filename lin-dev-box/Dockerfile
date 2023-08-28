@@ -56,7 +56,7 @@ export PATH=$PATH:$GOPATH/bin && \
 go install github.com/jesseduffield/lazygit@latest && \
 go install github.com/dundee/gdu/v5/cmd/gdu@latest && \
 # AstroNvim base config
-git clone --depth 1 https://github.com/AstroNvim/AstroNvim ~/.config/nvim && \
+git clone --depth 1 https://github.com/AstroNvim/AstroNvim /home/dev/.config/nvim && \
 # Clean apt
 apt clean && \
 # Create user and make it admin
