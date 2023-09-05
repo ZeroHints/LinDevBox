@@ -8,7 +8,8 @@ $workingDir = Join-Path $PSScriptRoot $dockerName
 
 Push-Location $workingDir
 try {
-    docker build --rm --no-cache -f Dockerfile -t "$($dockerName):dev" .
+    docker build --rm -f Dockerfile -t "$($dockerName):dev" .
+# --no-cache `
 }
 finally {
     Pop-Location
