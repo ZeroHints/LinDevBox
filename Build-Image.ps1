@@ -8,8 +8,9 @@ $workingDir = Join-Path $PSScriptRoot $dockerName
 
 Push-Location $workingDir
 try {
-    docker build --rm -f Dockerfile -t "$($dockerName):dev" .
-# --no-cache `
+    $date = Get-Date -Format "yyyyMMddHHmmss"
+    docker build --rm --build-arg CACHEBUST=$date --progress=plain -f Dockerfile -t "$($dockerName):dev" .
+# --no-cache
 }
 finally {
     Pop-Location

@@ -31,7 +31,7 @@ COPY --from=builder /tmp/neovim/build/nvim-linux64.deb nvim-linux64.deb
 
 # Setup essential packages
 RUN apt update && \
-apt install -y git sudo curl xclip ripgrep nodejs npm python3 python3-pip && \
+apt install -y git sudo curl xclip ripgrep unzip wget tar gzip nodejs npm python3 python3-pip python3-venv && \
 apt clean && \
 # Python
 update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
@@ -40,7 +40,7 @@ update-alternatives --install /usr/bin/py py /usr/bin/python3 1 && \
 dpkg -i nvim-linux64.deb && \
 rm nvim-linux64.deb && \
 # Go
-curl -O https://dl.google.com/go/go1.21.0.linux-amd64.tar.gz && \
+curl -s -O https://dl.google.com/go/go1.21.0.linux-amd64.tar.gz && \
 rm -rf /usr/local/go && \
 tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz && \
 rm go1.21.0.linux-amd64.tar.gz
@@ -61,7 +61,7 @@ ENV PATH=$PATH:$GOPATH/bin
 RUN \
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y && \
-source "$HOME/.cargo/env" && \
+source ~/.cargo/env && \
 # Rust tools
 cargo +stable install bottom  && \
 cargo +stable install tree-sitter-cli && \
@@ -73,10 +73,15 @@ export PATH=$PATH:$GOPATH/bin && \
 go install github.com/jesseduffield/lazygit@latest && \
 go install github.com/dundee/gdu/v5/cmd/gdu@latest
 
+ARG CACHEBUST=1
+
+USER root
+COPY assets/.config/nvim .config/nvim
+RUN chmod 777 -R .config/nvim
+
+USER dev 
+
 RUN \
-# AstroNvim base config
-git clone --depth 1 https://github.com/AstroNvim/AstroNvim "$HOME/.config/nvim" && \
-nvim +PlugInstall +qall && \
-nvim +MasonUpdate +qall
+nvim --headless -c "Lazy! sync" -c "qa"
 
 CMD ["bash"]
