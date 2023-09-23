@@ -31,7 +31,7 @@ COPY --from=builder /tmp/neovim/build/nvim-linux64.deb nvim-linux64.deb
 
 # Setup essential packages
 RUN apt update && \
-apt install -y git sudo curl xclip ripgrep unzip wget tar gzip nodejs npm python3 python3-pip python3-venv && \
+apt install -y git sudo curl xclip ripgrep unzip wget tar gzip nodejs npm python3 python3-pip python3-venv zsh && \
 apt clean && \
 # Python
 update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
@@ -73,8 +73,6 @@ export PATH=$PATH:$GOPATH/bin && \
 go install github.com/jesseduffield/lazygit@latest && \
 go install github.com/dundee/gdu/v5/cmd/gdu@latest
 
-ARG CACHEBUST=1
-
 USER root
 COPY assets/.config/nvim .config/nvim
 RUN chmod 777 -R .config/nvim
@@ -84,4 +82,8 @@ USER dev
 RUN \
 nvim --headless -c "Lazy! sync" -c "qa"
 
-CMD ["bash"]
+ARG CACHEBUST=1
+RUN \
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+CMD ["zsh"]
