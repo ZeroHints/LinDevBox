@@ -86,11 +86,9 @@ chmod +x /home/dev/entrypoint.sh
 
 USER dev 
 
-RUN \
-nvim --headless -c "Lazy! sync" -c "qa"
-
 # https://ohmyz.sh/#install
 RUN \
+nvim --headless -c "Lazy! sync" -c "qa" && \
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 SHELL ["/bin/zsh", "-c"]
