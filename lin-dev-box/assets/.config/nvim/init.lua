@@ -53,6 +53,19 @@ require('lazy').setup({
 })
 
 -- Options & Variables
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+vim.g.autoformat_enabled = true
+vim.g.cmp_enabled = true
+vim.g.autopairs_enabled = true
+vim.g.diagnostics_mode = 3
+vim.g.icons_enabled = true
+vim.g.ui_notifications_enabled = true
+vim.g.netrw_keepdir = 0
+vim.g.netrw_winsize = 30
+vim.g.netrw_banner = 0
+vim.g.netrw_localcopydircmd = 0
+
 vim.opt.relativenumber = true
 vim.opt.number = true
 vim.opt.spell = false
@@ -73,19 +86,5 @@ vim.opt.timeoutlen = 300 -- Decrease update time
 vim.opt.completeopt = 'menuone,noselect' -- Set completeopt to have a better completion experience
 vim.opt.termguicolors = true -- NOTE: You should make sure your terminal supports this
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-vim.g.autoformat_enabled = true
-vim.g.cmp_enabled = true
-vim.g.autopairs_enabled = true
-vim.g.diagnostics_mode = 3
-vim.g.icons_enabled = true
-vim.g.ui_notifications_enabled = true
-
-vim.g.netrw_keepdir = 0
-vim.g.netrw_winsize = 30
-vim.g.netrw_banner = 0
-vim.g.netrw_localcopydircmd = 0
-
-
--- Mappings
+-- Mappings and Extra configurations
+pcall(require('telescope').load_extension, 'fzf') -- Enable telescope fzf native, if installed
