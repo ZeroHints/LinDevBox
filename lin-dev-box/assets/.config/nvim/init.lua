@@ -10,7 +10,7 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
 vim.g.mapleader = " "
-vim.g.maplocalleader = ' '
+vim.g.maplocalleader = " "
 vim.g.autoformat_enabled = true
 vim.g.cmp_enabled = true
 vim.g.autopairs_enabled = true
