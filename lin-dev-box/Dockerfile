@@ -78,7 +78,6 @@ COPY assets/.config/nvim .config/nvim
 RUN chmod 777 -R .config/nvim
 
 USER dev 
-
 RUN \
 nvim --headless -c "Lazy! sync" -c "qa"
 
@@ -86,4 +85,6 @@ ARG CACHEBUST=1
 RUN \
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-CMD ["zsh"]
+CMD sudo chown -R dev:dev mnt && \
+sudo chmod -R 755 mnt && \
+zsh
