@@ -73,18 +73,25 @@ export PATH=$PATH:$GOPATH/bin && \
 go install github.com/jesseduffield/lazygit@latest && \
 go install github.com/dundee/gdu/v5/cmd/gdu@latest
 
+# ARG CACHEBUST=1
+
 USER root
+
 COPY assets/.config/nvim .config/nvim
-RUN chmod 777 -R .config/nvim
+COPY entrypoint.sh /home/dev/entrypoint.sh
+
+RUN \
+chmod 777 -R .config/nvim && \
+chmod +x /home/dev/entrypoint.sh
 
 USER dev 
+
 RUN \
 nvim --headless -c "Lazy! sync" -c "qa"
 
-ARG CACHEBUST=1
 RUN \
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-CMD sudo chown -R dev:dev mnt && \
-sudo chmod -R 755 mnt && \
-zsh
+SHELL ["/bin/zsh", "-c"]
+
+ENTRYPOINT ["/home/dev/entrypoint.sh"]
