@@ -18,6 +18,11 @@ vim.g.diagnostics_mode = 3
 vim.g.icons_enabled = true
 vim.g.ui_notifications_enabled = true
 
+vim.g.netrw_keepdir = 0
+vim.g.netrw_winsize = 30
+vim.g.netrw_banner = 0
+vim.g.netrw_localcopydircmd = 0
+
 -- Plugins
 
 -- Install package manager
@@ -35,4 +40,15 @@ if not vim.loop.fs_stat(lazyDirPath) then
 end
 vim.opt.rtp:prepend(lazyDirPath)
 
-require('lazy').setup({})
+require('lazy').setup({
+  'nvim-lualine/lualine.nvim'
+})
+
+require("lualine").setup({
+  options = {
+    icons_enabled = false,
+    theme = "onedark",
+    component_separators = "|",
+    section_separators = "",
+  }
+})

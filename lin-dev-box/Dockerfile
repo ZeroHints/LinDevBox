@@ -73,7 +73,7 @@ export PATH=$PATH:$GOPATH/bin && \
 go install github.com/jesseduffield/lazygit@latest && \
 go install github.com/dundee/gdu/v5/cmd/gdu@latest
 
-# ARG CACHEBUST=1
+ARG CACHEBUST=1
 
 USER root
 
@@ -89,6 +89,7 @@ USER dev
 RUN \
 nvim --headless -c "Lazy! sync" -c "qa"
 
+# https://ohmyz.sh/#install
 RUN \
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
