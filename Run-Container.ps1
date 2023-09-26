@@ -15,7 +15,7 @@ try {
         Write-Host "Creating '$volumeName'."
         docker volume create $volumeName | Out-Null
     } 
-    docker run --rm -it -v "$($volumeName):/home/dev/mnt:rw" --name lin-dev-box "$($dockerName):dev"
+    docker run --rm -it -v "$($volumeName):/home/dev/mnt:rw" --network bridge -p 4000-4040:4000-4040 --name lin-dev-box "$($dockerName):dev"
 }
 finally {
     Pop-Location
