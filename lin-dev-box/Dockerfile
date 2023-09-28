@@ -8,7 +8,7 @@ apt clean
 WORKDIR /tmp
 
 # Building neovim package from source: https://github.com/neovim/neovim/wiki/Installing-Neovim#install-from-source
-# /tmp/neovim
+# Output: /tmp/neovim/build/nvim-linux64.deb
 RUN git clone https://github.com/neovim/neovim && \
 cd neovim && \
 git checkout tags/v0.9.1 && \
@@ -23,9 +23,7 @@ LABEL maintainer="AgentZero"
 
 SHELL ["/bin/bash", "-c"]
 
-# Set non-interactive environment
-ENV DEBIAN_FRONTEND=noninteractive
-
+# Install binaries
 WORKDIR /tmp
 COPY --from=builder /tmp/neovim/build/nvim-linux64.deb nvim-linux64.deb
 
@@ -47,7 +45,7 @@ rm go1.21.0.linux-amd64.tar.gz
 
 # Create user and make it admin
 RUN groupadd -g 1000 dev && \
-useradd -m -u 1000 -g dev -s /bin/bash dev && \
+useradd -m -u 1000 -g dev -s /bin/zsh dev && \
 echo "dev:1234" | chpasswd && \
 usermod -aG sudo dev
 
@@ -65,6 +63,7 @@ source ~/.cargo/env && \
 # Rust tools
 cargo +stable install bottom  && \
 cargo +stable install tree-sitter-cli && \
+cargo +stable install lsd && \
 # Go
 export PATH=$PATH:/usr/local/go/bin && \
 export GOPATH=$HOME/go && \
@@ -73,24 +72,34 @@ export PATH=$PATH:$GOPATH/bin && \
 go install github.com/jesseduffield/lazygit@latest && \
 go install github.com/dundee/gdu/v5/cmd/gdu@latest
 
-ARG CACHEBUST=1
+COPY assets/.config/nvim .config/nvim
+COPY entrypoint.sh entrypoint.sh
 
 USER root
-
-COPY assets/.config/nvim .config/nvim
-COPY entrypoint.sh /home/dev/entrypoint.sh
-
 RUN \
 chmod 777 -R .config/nvim && \
-chmod +x /home/dev/entrypoint.sh
+chmod +x entrypoint.sh
 
 USER dev 
-
-# https://ohmyz.sh/#install
 RUN \
-nvim --headless -c "Lazy! sync" -c "qa" && \
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+nvim --headless -c "Lazy! sync" -c "qa"
 
 SHELL ["/bin/zsh", "-c"]
+
+# Setup zsh theme and plugins: https://ohmyz.sh/#install
+RUN \
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
+source .zshrc && \
+mkdir -p "$ZSH_CUSTOM/themes" && \
+mkdir -p "$ZSH_CUSTOM/plugins" && \
+git clone https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k && \
+git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions && \
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+
+COPY assets/.p10k.zsh .p10k.zsh
+COPY assets/.zshrc .zshrc
+COPY assets/.env_vars.sh .env_vars.sh
+
+ARG CACHEBUST=1
 
 ENTRYPOINT ["/home/dev/entrypoint.sh"]
