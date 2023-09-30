@@ -23,9 +23,12 @@ LABEL maintainer="AgentZero"
 
 SHELL ["/bin/bash", "-c"]
 
-# Install binaries
 WORKDIR /tmp
-COPY --from=builder /tmp/neovim/build/nvim-linux64.deb nvim-linux64.deb
+
+USER root
+
+# Copy binaries built in previous stage
+COPY --chown=dev:dev --from=builder /tmp/neovim/build/nvim-linux64.deb nvim-linux64.deb
 
 # Setup essential packages
 RUN apt update && \
@@ -34,7 +37,7 @@ apt clean && \
 # Python
 update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
 update-alternatives --install /usr/bin/py py /usr/bin/python3 1 && \
-# Nvim
+# Nvim from binaries
 dpkg -i nvim-linux64.deb && \
 rm nvim-linux64.deb && \
 # Go
@@ -45,49 +48,18 @@ rm go1.21.0.linux-amd64.tar.gz
 
 # Create user and make it admin
 RUN groupadd -g 1000 dev && \
-useradd -m -u 1000 -g dev -s /bin/zsh dev && \
+useradd -m -u 1000 -s /bin/zsh -g dev dev && \
 echo "dev:1234" | chpasswd && \
 usermod -aG sudo dev
 
-USER dev
 WORKDIR /home/dev
 
-ENV PATH=$PATH:/usr/local/go/bin
-ENV GOPATH=$HOME/dev/go
-ENV PATH=$PATH:$GOPATH/bin
-
-RUN \
-# Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y && \
-source ~/.cargo/env && \
-# Rust tools
-cargo +stable install bottom  && \
-cargo +stable install tree-sitter-cli && \
-cargo +stable install lsd && \
-# Go
-export PATH=$PATH:/usr/local/go/bin && \
-export GOPATH=$HOME/go && \
-export PATH=$PATH:$GOPATH/bin && \
-# Go tools
-go install github.com/jesseduffield/lazygit@latest && \
-go install github.com/dundee/gdu/v5/cmd/gdu@latest
-
-COPY assets/.config/nvim .config/nvim
-COPY entrypoint.sh entrypoint.sh
-
-USER root
-RUN \
-chmod 777 -R .config/nvim && \
-chmod +x entrypoint.sh
-
-USER dev 
-RUN \
-nvim --headless -c "Lazy! sync" -c "qa"
+USER dev
 
 SHELL ["/bin/zsh", "-c"]
 
-# Setup zsh theme and plugins: https://ohmyz.sh/#install
 RUN \
+# Setup zsh shell and plugins: https://ohmyz.sh/#install
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
 source .zshrc && \
 mkdir -p "$ZSH_CUSTOM/themes" && \
@@ -96,10 +68,34 @@ git clone https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerl
 git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions && \
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 
-COPY assets/.p10k.zsh .p10k.zsh
-COPY assets/.zshrc .zshrc
-COPY assets/.env_vars.sh .env_vars.sh
-
 ARG CACHEBUST=1
 
-ENTRYPOINT ["/home/dev/entrypoint.sh"]
+# Copy files
+COPY --chown=dev:dev assets/.config/nvim .config/nvim
+COPY --chown=dev:dev assets/.p10k.zsh .p10k.zsh
+COPY --chown=dev:dev assets/.zshrc .zshrc
+COPY --chown=dev:dev assets/entrypoint.sh entrypoint.sh
+
+RUN \
+# Change permissions to coppied files
+chmod 755 -R .config/nvim && \
+chmod 755 .p10k.zsh && \
+chmod 755 .zshrc && \
+chmod 755 entrypoint.sh && \
+# Source variables
+source .zshrc && \
+# Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y && \
+source ~/.cargo/env && \
+# Rust tools
+cargo +stable install bottom  && \
+cargo +stable install tree-sitter-cli && \
+cargo +stable install lsd && \
+# Go tools
+go install github.com/jesseduffield/lazygit@latest && \
+go install github.com/dundee/gdu/v5/cmd/gdu@latest
+
+RUN \
+nvim --headless -c "Lazy! sync" -c "qa"
+
+ENTRYPOINT ["./entrypoint.sh"]
