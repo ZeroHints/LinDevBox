@@ -68,8 +68,6 @@ git clone https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerl
 git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions && \
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 
-ARG CACHEBUST=1
-
 # Copy files
 COPY --chown=dev:dev assets/.config/nvim .config/nvim
 COPY --chown=dev:dev assets/.p10k.zsh .p10k.zsh
@@ -99,3 +97,5 @@ RUN \
 nvim --headless -c "Lazy! sync" -c "qa"
 
 ENTRYPOINT ["./entrypoint.sh"]
+
+# ARG CACHEBUST=1
