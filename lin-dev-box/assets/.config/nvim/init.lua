@@ -48,6 +48,21 @@ require('lazy').setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
+    cmd = {
+      "TSBufDisable",
+      "TSBufEnable",
+      "TSBufToggle",
+      "TSDisable",
+      "TSEnable",
+      "TSToggle",
+      "TSInstall",
+      "TSInstallInfo",
+      "TSInstallSync",
+      "TSModuleInfo",
+      "TSUninstall",
+      "TSUpdate",
+      "TSUpdateSync",
+    },
     build = ':TSUpdate',
   },
 })
@@ -85,6 +100,8 @@ vim.opt.updatetime = 250 -- Decrease update time
 vim.opt.timeoutlen = 300 -- Decrease update time
 vim.opt.completeopt = 'menuone,noselect' -- Set completeopt to have a better completion experience
 vim.opt.termguicolors = true -- NOTE: You should make sure your terminal supports this
+
+pcall(vim.cmd.colorscheme, 'darkblue')
 
 -- Mappings and Extra configurations
 pcall(require('telescope').load_extension, 'fzf') -- Enable telescope fzf native, if installed
